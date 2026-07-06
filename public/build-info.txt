@@ -1,0 +1,3 @@
+Workflow OS – deploy health check
+Wenn du diese Datei live siehst, ist der aktuelle Build ausgeliefert.
+canary: canary-4d9e21
