@@ -1,0 +1,3 @@
+# SPA fallback (portable across Netlify & Cloudflare Pages).
+# Vite copies public/ into dist/, so this lands at the site root.
+/*    /index.html    200

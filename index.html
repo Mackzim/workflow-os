@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="de" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0b0e" />
+    <meta name="description" content="Personal Workflow OS – tasks, dashboard and a Claude command center." />
+    <title>Workflow OS</title>
+    <!-- Paint the dark base immediately so there is no white flash before CSS/JS load (esp. in the Tauri window). -->
+    <style>
+      html,
+      body,
+      #root {
+        background-color: #0a0b0e;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,149 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   Design Tokens
+   Single source of truth for the visual language.
+   Swap these to re-theme the whole app.
+   ============================================================ */
+:root {
+  /* Surfaces – near-black anthracite base */
+  --color-bg: #0a0b0e;
+  --color-bg-soft: #0d0f14;
+  --color-surface: #14171f;
+  --color-surface-elevated: #1a1e29;
+  --color-surface-hover: #1f2431;
+
+  /* Borders */
+  --color-border: #232936;
+  --color-border-strong: #333a4a;
+
+  /* Brand – modern blue with a sparse cyan secondary */
+  --color-primary: #4c8dff;
+  --color-primary-strong: #2f6bff;
+  --color-primary-soft: rgba(76, 141, 255, 0.14);
+  --color-secondary: #22d3ee;
+
+  /* Text */
+  --color-text: #eaeef5;
+  --color-text-muted: #9aa6b8;
+  --color-text-faint: #6b7688;
+
+  /* Semantic states – deliberately desaturated / premium */
+  --color-success: #34d399;
+  --color-warning: #f5b056;
+  --color-critical: #fb6e6e;
+
+  /* Priority scale 1..5 (low -> critical) */
+  --prio-1: #6b7688;
+  --prio-2: #5b9bff;
+  --prio-3: #22d3ee;
+  --prio-4: #f5b056;
+  --prio-5: #fb6e6e;
+
+  color-scheme: dark;
+}
+
+/* ============================================================
+   Base
+   ============================================================ */
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-bg text-content font-sans antialiased;
+    background-image:
+      radial-gradient(1200px 600px at 15% -10%, rgba(76, 141, 255, 0.06), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(34, 211, 238, 0.04), transparent 55%);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: rgba(76, 141, 255, 0.28);
+  }
+
+  /* Slim, unobtrusive scrollbars that fit the dark theme */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-strong) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--color-border-strong);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: #414a5c;
+    background-clip: padding-box;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+}
+
+/* ============================================================
+   Reusable component classes
+   ============================================================ */
+@layer components {
+  .surface-panel {
+    @apply bg-surface border border-border rounded-2xl shadow-card;
+  }
+
+  .hairline {
+    @apply border-t border-border;
+  }
+
+  /* Subtle top highlight used on elevated cards */
+  .edge-light {
+    position: relative;
+  }
+  .edge-light::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0));
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+/* ============================================================
+   Motion accessibility – hard stop for reduced-motion users.
+   Framer Motion also reads this via useReducedMotion, this is
+   the belt-and-suspenders fallback for CSS transitions.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

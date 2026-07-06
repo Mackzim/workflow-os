@@ -1,0 +1,14 @@
+# Netlify deploy config for the Workflow OS PWA (static Vite build).
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# SPA fallback: client-side routes like /tasks or /command must serve index.html
+# on direct load / refresh (react-router handles the rest in the browser).
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
