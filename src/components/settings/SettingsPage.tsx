@@ -8,12 +8,15 @@ import { Page, PageHeader } from '@/components/common/Page';
 import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
+import { useAuthStore } from '@/store/useAuthStore';
+import { isSyncConfigured } from '@/lib/sync/supabaseClient';
 
 export function SettingsPage() {
   const { tasks, replaceAll, clearAll } = useTaskStore(
     useShallow((s) => ({ tasks: s.tasks, replaceAll: s.replaceAll, clearAll: s.clearAll })),
   );
   const resetWidgets = useWidgetStore((s) => s.resetWidgets);
+  const { user, signOut } = useAuthStore(useShallow((s) => ({ user: s.user, signOut: s.signOut })));
   const fileRef = useRef<HTMLInputElement>(null);
   const [note, setNote] = useState<string | null>(null);
 
@@ -48,6 +51,26 @@ export function SettingsPage() {
       <PageHeader title="Settings" subtitle="App, Daten & Darstellung" icon={<Icon name="settings" size={20} />} />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {isSyncConfigured && (
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle>Konto</CardTitle>
+              <span className="inline-flex items-center gap-1.5 text-[11px] text-success">
+                <span className="h-1.5 w-1.5 rounded-full bg-success" /> Sync aktiv
+              </span>
+            </CardHeader>
+            <CardBody className="flex flex-wrap items-center justify-between gap-3">
+              <div className="text-[13px]">
+                <p className="text-content-faint">Angemeldet als</p>
+                <p className="text-content">{user?.email ?? '—'}</p>
+              </div>
+              <Button size="sm" variant="secondary" leftIcon={<Icon name="close" size={15} />} onClick={() => signOut()}>
+                Abmelden
+              </Button>
+            </CardBody>
+          </Card>
+        )}
+
         <Card>
           <CardHeader>
             <CardTitle>Über</CardTitle>
@@ -55,7 +78,7 @@ export function SettingsPage() {
           <CardBody className="space-y-2 text-[13px] text-content-muted">
             <Row label="Produkt" value={APP.name} />
             <Row label="Version" value={APP.version} />
-            <Row label="Speicherung" value="Lokal (localStorage)" />
+            <Row label="Speicherung" value={isSyncConfigured ? 'Cloud-Sync (Supabase)' : 'Lokal (localStorage)'} />
             <Row label="Aufgaben" value={String(tasks.length)} />
           </CardBody>
         </Card>
