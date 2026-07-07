@@ -48,13 +48,18 @@ export function TaskForm({ task, onDone }: TaskFormProps) {
   return (
     <form onSubmit={submit} className="flex flex-col gap-4">
       <div>
-        <label className="mb-1.5 block text-[12px] font-medium text-content-muted">Titel</label>
-        <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Was ist zu tun?" autoFocus />
+        <label className="mb-1.5 block text-[12px] font-medium text-content-muted">Headline</label>
+        <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Kurz & knackig – was ist zu tun?" autoFocus />
       </div>
 
       <div>
-        <label className="mb-1.5 block text-[12px] font-medium text-content-muted">Beschreibung</label>
-        <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Details (optional)" />
+        <label className="mb-1.5 block text-[12px] font-medium text-content-muted">Notizen</label>
+        <Textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={5}
+          placeholder="Details, Kontext, Teilschritte … (mehrzeilig)"
+        />
       </div>
 
       <div className="grid grid-cols-2 gap-3">

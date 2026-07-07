@@ -128,7 +128,7 @@ const TaskCardBase = forwardRef<HTMLDivElement, TaskCardProps>(function TaskCard
         </div>
 
         {task.description && (
-          <p className="mt-0.5 line-clamp-1 break-words text-[13px] text-content-muted group-hover:line-clamp-none">
+          <p className="mt-1 line-clamp-2 whitespace-pre-line break-words text-[13px] leading-relaxed text-content-muted group-hover:line-clamp-none">
             {task.description}
           </p>
         )}

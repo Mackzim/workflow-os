@@ -54,29 +54,34 @@ function registerTools(server: McpServer, sb: SupabaseClient, userId: string): v
     'workflow_create_task',
     {
       title: 'Create task',
-      description: `Create a new task in Workflow OS. It syncs to the dashboard (web + phone) immediately.
+      description: `Create a task in Workflow OS. Syncs to the dashboard (web + phone) immediately.
+
+Give every task a clear HEADLINE (title) PLUS NOTES (notes) with the useful details/context. Do NOT create bare one-liners when you have more to say — put the reasoning, sub-steps or context into notes.
 
 Args:
-  - title (string, required)
+  - title (string, required): a concise headline (a few words)
+  - notes (string): details, context, sub-steps — multi-line allowed. Fill this whenever you have any context.
   - priority (1-5): 1=low … 5=critical (default 3)
   - status ('open'|'in_progress'|'paused'|'done'): default 'open'
-  - due_date (string): 'YYYY-MM-DD', or the keywords 'today'/'tomorrow'
-  - category (string), description (string)
+  - due_date (string): 'YYYY-MM-DD', or 'today'/'tomorrow'
+  - category (string)
 
-Example: "Call Jochen tomorrow, priority 4" -> { title:"Call Jochen", priority:4, due_date:"tomorrow" }`,
+Example: "Jochen wegen Sortiment anrufen, morgen, wichtig" ->
+  { title: "Jochen anrufen", notes: "Sortimentserweiterung besprechen – neue Lieferantenkonditionen klären, Liefertermine abstimmen.", priority: 4, due_date: "tomorrow", category: "Vertrieb" }`,
       inputSchema: {
-        title: z.string().min(1).describe('Task title'),
+        title: z.string().min(1).describe('Concise headline for the task'),
+        notes: z.string().optional().describe('Notes / details / context (multi-line ok). Fill whenever you have context.'),
         priority: priority.optional().describe('1=low … 5=critical (default 3)'),
         status: statusEnum.optional(),
         due_date: z.string().optional().describe("'YYYY-MM-DD' or 'today'/'tomorrow'"),
         category: z.string().optional(),
-        description: z.string().optional(),
       },
       annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: true },
     },
     async (args) => {
       try {
-        const task = await T.createTask(sb, userId, { ...args, due_date: resolveDue(args.due_date) });
+        const { notes, due_date, ...rest } = args;
+        const task = await T.createTask(sb, userId, { ...rest, description: notes, due_date: resolveDue(due_date) });
         return ok(
           `✓ Task "${task.title}" erstellt (${T.PRIORITY_LABEL[task.priority]}, ${T.STATUS_LABEL[task.status]}).`,
           { task: task as unknown as Record<string, unknown> },
@@ -126,11 +131,11 @@ Returns: { count, tasks: [{ id, title, priority, status, dueDate, category, ... 
 
 Args:
   - id (string, required)
-  - any of: title, description, priority (1-5), status, due_date ('YYYY-MM-DD'/'today'/'tomorrow'), category`,
+  - any of: title (headline), notes (details, multi-line ok), priority (1-5), status, due_date ('YYYY-MM-DD'/'today'/'tomorrow'), category`,
       inputSchema: {
         id: z.string().min(1).describe('Task id'),
-        title: z.string().optional(),
-        description: z.string().optional(),
+        title: z.string().optional().describe('Headline'),
+        notes: z.string().optional().describe('Notes / details (multi-line ok)'),
         priority: priority.optional(),
         status: statusEnum.optional(),
         due_date: z.string().optional(),
@@ -140,10 +145,11 @@ Args:
     },
     async (args) => {
       try {
-        const { id, ...patch } = args;
+        const { id, notes, due_date, ...patch } = args;
         const task = await T.updateTask(sb, userId, id, {
           ...patch,
-          due_date: patch.due_date !== undefined ? resolveDue(patch.due_date) : undefined,
+          ...(notes !== undefined ? { description: notes } : {}),
+          due_date: due_date !== undefined ? resolveDue(due_date) : undefined,
         });
         if (!task) return ok(`Task ${id} nicht gefunden.`);
         return ok(`✓ Task "${task.title}" aktualisiert.`, { task: task as unknown as Record<string, unknown> });
