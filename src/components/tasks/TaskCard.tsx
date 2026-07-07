@@ -80,11 +80,11 @@ const TaskCardBase = forwardRef<HTMLDivElement, TaskCardProps>(function TaskCard
             pathLength={1}
             strokeDasharray="1"
             style={{ filter: 'drop-shadow(0 0 5px rgba(34,211,238,0.55))' }}
-            initial={{ strokeDashoffset: 1, opacity: 1 }}
-            animate={{ strokeDashoffset: 0, opacity: [1, 1, 0] }}
+            initial={{ strokeDashoffset: 1, opacity: 0 }}
+            animate={{ strokeDashoffset: 0, opacity: [0, 1, 1, 0] }}
             transition={{
-              strokeDashoffset: { duration: 0.5, ease: EASE },
-              opacity: { duration: 0.95, times: [0, 0.55, 1] },
+              strokeDashoffset: { duration: 0.55, ease: EASE },
+              opacity: { duration: 1, times: [0, 0.18, 0.62, 1], ease: 'easeOut' },
             }}
           />
         </svg>
