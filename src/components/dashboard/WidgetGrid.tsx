@@ -72,21 +72,26 @@ export function WidgetGrid() {
   // with sizing rails attached from the widget constraints.
   const rglLayouts: Layouts = {};
   for (const bp of BREAKPOINTS) {
+    const cols = GRID_COLS[bp];
     const list = layouts[bp]
       .filter((it) => enabledKinds.has(it.i))
       .map((it) => {
         const c = WIDGET_CONSTRAINTS[it.i];
-        return { ...it, minW: c.minW, minH: c.minH, maxW: c.maxW, maxH: c.maxH };
+        const w = Math.min(it.w, cols);
+        // Clamp minW to the item width + column count so RGL never warns about
+        // "minWidth larger than item width" on the narrow (1-column) breakpoint.
+        return { ...it, w, minW: Math.min(c.minW, w), minH: c.minH, maxW: c.maxW, maxH: c.maxH };
       });
     // Fallback: an enabled widget with no stored slot (e.g. added after the
     // layout was last saved) gets placed from the defaults / at the bottom.
     const present = new Set(list.map((it) => it.i));
-    for (const w of orderedEnabled) {
-      if (present.has(w.kind)) continue;
-      const preset = DEFAULT_LAYOUTS[bp].find((d) => d.i === w.kind);
-      const c = WIDGET_CONSTRAINTS[w.kind];
-      const base = preset ?? { i: w.kind, x: 0, y: 9999, w: bp === 'xs' ? 1 : 2, h: 2 };
-      list.push({ ...base, minW: c.minW, minH: c.minH, maxW: c.maxW, maxH: c.maxH });
+    for (const item of orderedEnabled) {
+      if (present.has(item.kind)) continue;
+      const preset = DEFAULT_LAYOUTS[bp].find((d) => d.i === item.kind);
+      const c = WIDGET_CONSTRAINTS[item.kind];
+      const base = preset ?? { i: item.kind, x: 0, y: 9999, w: bp === 'xs' ? 1 : 2, h: 2 };
+      const w = Math.min(base.w, cols);
+      list.push({ ...base, w, minW: Math.min(c.minW, w), minH: c.minH, maxW: c.maxW, maxH: c.maxH });
     }
     rglLayouts[bp] = list;
   }
