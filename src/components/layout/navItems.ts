@@ -21,6 +21,7 @@ export const NAV_ACTIVE: NavItem[] = [
   item('dashboard', 'dashboard', FEATURES.dashboard),
   item('tasks', 'tasks', FEATURES.tasks),
   item('calendar', 'calendar', FEATURES.calendar),
+  item('seo', 'chart', FEATURES.seo),
   item('command', 'command', FEATURES.commandCenter),
 ];
 

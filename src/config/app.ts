@@ -18,6 +18,7 @@ export const FEATURES = {
   dashboard: true,
   commandCenter: true,
   calendar: true,
+  seo: true,
   // Prepared but not implemented in 0.1.0:
   projects: false,
   notes: false,

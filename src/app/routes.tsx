@@ -3,6 +3,7 @@ import { AppShell } from '@/components/layout/AppShell';
 import { DashboardPage } from '@/components/dashboard/DashboardPage';
 import { TasksPage } from '@/components/tasks/TasksPage';
 import { CalendarPage } from '@/components/calendar/CalendarPage';
+import { SeoPage } from '@/components/seo/SeoPage';
 import { CommandCenterPage } from '@/components/command/CommandCenterPage';
 import { SettingsPage } from '@/components/settings/SettingsPage';
 import { PlaceholderPage } from '@/components/common/PlaceholderPage';
@@ -63,6 +64,7 @@ export function AppRoutes() {
           }
         />
         <Route path="calendar" element={<CalendarPage />} />
+        <Route path="seo" element={<SeoPage />} />
         <Route
           path="automations"
           element={

@@ -48,6 +48,12 @@ export const WIDGET_DEFINITIONS: Record<WidgetKind, WidgetDefinition> = {
     description: 'Steuere die App über Befehle – später via Claude.',
     placeholder: false,
   },
+  seo: {
+    kind: 'seo',
+    title: 'SEO',
+    description: 'Search-Console-Überblick (Demo).',
+    placeholder: false,
+  },
   upcoming: {
     kind: 'upcoming',
     title: 'Anstehend',
@@ -74,6 +80,7 @@ export const WIDGET_ORDER: WidgetKind[] = [
   'highPriority',
   'openTasks',
   'progress',
+  'seo',
   'quickAdd',
   'upcoming',
   'notes',
@@ -103,6 +110,7 @@ export const WIDGET_CONSTRAINTS: Record<WidgetKind, GridConstraint> = {
   progress: { minW: 2, minH: 2 },
   quickAdd: { minW: 1, minH: 2 },
   command: { minW: 2, minH: 2 },
+  seo: { minW: 1, minH: 2 },
   upcoming: { minW: 1, minH: 2 },
   notes: { minW: 1, minH: 2 },
   automations: { minW: 1, minH: 2 },
@@ -112,26 +120,28 @@ export const WIDGET_CONSTRAINTS: Record<WidgetKind, GridConstraint> = {
 const LG_LAYOUT: GridItem[] = [
   { i: 'today', x: 0, y: 0, w: 2, h: 2 },
   { i: 'highPriority', x: 2, y: 0, w: 2, h: 2 },
-  { i: 'openTasks', x: 0, y: 2, w: 2, h: 2 },
+  { i: 'seo', x: 0, y: 2, w: 2, h: 2 },
   { i: 'progress', x: 2, y: 2, w: 2, h: 2 },
-  { i: 'quickAdd', x: 0, y: 4, w: 2, h: 2 },
-  { i: 'upcoming', x: 2, y: 4, w: 1, h: 2 },
-  { i: 'notes', x: 3, y: 4, w: 1, h: 2 },
-  { i: 'command', x: 0, y: 6, w: 4, h: 2 },
-  { i: 'automations', x: 0, y: 8, w: 2, h: 2 },
+  { i: 'openTasks', x: 0, y: 4, w: 2, h: 2 },
+  { i: 'quickAdd', x: 2, y: 4, w: 2, h: 2 },
+  { i: 'upcoming', x: 0, y: 6, w: 1, h: 2 },
+  { i: 'notes', x: 1, y: 6, w: 1, h: 2 },
+  { i: 'command', x: 0, y: 8, w: 4, h: 2 },
+  { i: 'automations', x: 0, y: 10, w: 2, h: 2 },
 ];
 
 /** Tablet board (2 columns). */
 const SM_LAYOUT: GridItem[] = [
   { i: 'today', x: 0, y: 0, w: 2, h: 2 },
   { i: 'highPriority', x: 0, y: 2, w: 2, h: 2 },
-  { i: 'openTasks', x: 0, y: 4, w: 2, h: 2 },
+  { i: 'seo', x: 0, y: 4, w: 2, h: 2 },
   { i: 'progress', x: 0, y: 6, w: 2, h: 2 },
-  { i: 'quickAdd', x: 0, y: 8, w: 2, h: 2 },
-  { i: 'upcoming', x: 0, y: 10, w: 1, h: 2 },
-  { i: 'notes', x: 1, y: 10, w: 1, h: 2 },
-  { i: 'command', x: 0, y: 12, w: 2, h: 2 },
-  { i: 'automations', x: 0, y: 14, w: 2, h: 2 },
+  { i: 'openTasks', x: 0, y: 8, w: 2, h: 2 },
+  { i: 'quickAdd', x: 0, y: 10, w: 2, h: 2 },
+  { i: 'upcoming', x: 0, y: 12, w: 1, h: 2 },
+  { i: 'notes', x: 1, y: 12, w: 1, h: 2 },
+  { i: 'command', x: 0, y: 14, w: 2, h: 2 },
+  { i: 'automations', x: 0, y: 16, w: 2, h: 2 },
 ];
 
 /** Phone board (1 column, everything stacked in catalog order). */

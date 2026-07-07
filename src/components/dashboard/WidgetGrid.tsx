@@ -5,6 +5,7 @@ import 'react-resizable/css/styles.css';
 import type { Breakpoint, WidgetConfig, WidgetDefinition, WidgetKind } from '@/lib/widgets/widgetTypes';
 import { useWidgetConfig } from '@/hooks/useWidgetConfig';
 import {
+  DEFAULT_LAYOUTS,
   GRID_BREAKPOINTS,
   GRID_COLS,
   GRID_MARGIN,
@@ -22,6 +23,7 @@ import { ProgressWidget } from './widgets/ProgressWidget';
 import { QuickAddWidget } from './widgets/QuickAddWidget';
 import { CommandWidget } from './widgets/CommandWidget';
 import { UpcomingWidget } from './widgets/UpcomingWidget';
+import { SeoWidget } from './widgets/SeoWidget';
 import { PlaceholderWidget } from './widgets/PlaceholderWidget';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -43,6 +45,8 @@ function renderWidget(kind: WidgetKind, def: WidgetDefinition) {
       return <CommandWidget />;
     case 'upcoming':
       return <UpcomingWidget />;
+    case 'seo':
+      return <SeoWidget />;
     default:
       return <PlaceholderWidget def={def} />;
   }
@@ -68,12 +72,23 @@ export function WidgetGrid() {
   // with sizing rails attached from the widget constraints.
   const rglLayouts: Layouts = {};
   for (const bp of BREAKPOINTS) {
-    rglLayouts[bp] = layouts[bp]
+    const list = layouts[bp]
       .filter((it) => enabledKinds.has(it.i))
       .map((it) => {
         const c = WIDGET_CONSTRAINTS[it.i];
         return { ...it, minW: c.minW, minH: c.minH, maxW: c.maxW, maxH: c.maxH };
       });
+    // Fallback: an enabled widget with no stored slot (e.g. added after the
+    // layout was last saved) gets placed from the defaults / at the bottom.
+    const present = new Set(list.map((it) => it.i));
+    for (const w of orderedEnabled) {
+      if (present.has(w.kind)) continue;
+      const preset = DEFAULT_LAYOUTS[bp].find((d) => d.i === w.kind);
+      const c = WIDGET_CONSTRAINTS[w.kind];
+      const base = preset ?? { i: w.kind, x: 0, y: 9999, w: bp === 'xs' ? 1 : 2, h: 2 };
+      list.push({ ...base, minW: c.minW, minH: c.minH, maxW: c.maxW, maxH: c.maxH });
+    }
+    rglLayouts[bp] = list;
   }
 
   const handleLayoutChange = (current: Layout[]) => {

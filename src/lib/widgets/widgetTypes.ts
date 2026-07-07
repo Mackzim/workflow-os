@@ -12,6 +12,7 @@ export type WidgetKind =
   | 'progress'
   | 'quickAdd'
   | 'command'
+  | 'seo'
   | 'upcoming' // placeholder
   | 'notes' // placeholder
   | 'automations'; // placeholder

@@ -8,10 +8,11 @@ export type ModuleKey =
   | 'dashboard'
   | 'tasks'
   | 'command'
+  | 'calendar'
+  | 'seo'
   | 'projects'
   | 'notes'
   | 'objects'
-  | 'calendar'
   | 'automations'
   | 'integrations'
   | 'settings';
@@ -20,10 +21,11 @@ export const MODULE_ROUTES: Record<ModuleKey, string> = {
   dashboard: '/',
   tasks: '/tasks',
   command: '/command',
+  calendar: '/calendar',
+  seo: '/seo',
   projects: '/projects',
   notes: '/notes',
   objects: '/objects',
-  calendar: '/calendar',
   automations: '/automations',
   integrations: '/integrations',
   settings: '/settings',
@@ -33,10 +35,11 @@ export const MODULE_LABELS: Record<ModuleKey, string> = {
   dashboard: 'Dashboard',
   tasks: 'Tasks',
   command: 'Command Center',
+  calendar: 'Calendar',
+  seo: 'SEO',
   projects: 'Projects',
   notes: 'Notes',
   objects: 'Objects',
-  calendar: 'Calendar',
   automations: 'Automations',
   integrations: 'Integrations',
   settings: 'Settings',
@@ -64,6 +67,9 @@ const MODULE_ALIASES: Record<string, ModuleKey> = {
   objekte: 'objects',
   calendar: 'calendar',
   kalender: 'calendar',
+  seo: 'seo',
+  search: 'seo',
+  suchmaschine: 'seo',
   automations: 'automations',
   automationen: 'automations',
   integrations: 'integrations',

@@ -38,6 +38,7 @@ export type IconName =
   | 'sun'
   | 'moon'
   | 'grip'
+  | 'chart'
   | 'reset'
   | 'send';
 
@@ -177,6 +178,15 @@ const PATHS: Record<IconName, ReactNode> = {
       <circle cx="15" cy="6" r="1" />
       <circle cx="15" cy="12" r="1" />
       <circle cx="15" cy="18" r="1" />
+    </>
+  ),
+  chart: (
+    <>
+      <path d="M3 21h18" />
+      <path d="M6 21v-7" />
+      <path d="M11 21V6" />
+      <path d="M16 21v-10" />
+      <path d="M20 21V9" />
     </>
   ),
   reset: (
