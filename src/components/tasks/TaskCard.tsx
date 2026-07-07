@@ -65,15 +65,29 @@ const TaskCardBase = forwardRef<HTMLDivElement, TaskCardProps>(function TaskCard
         done && 'opacity-60',
       )}
     >
-      {/* Completion glow */}
+      {/* Completion flourish: a turquoise outline draws around the card once, then fades out. */}
       {completing && (
-        <motion.div
-          className="pointer-events-none absolute inset-0 rounded-xl"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          style={{ boxShadow: '0 0 0 1px rgba(52,211,153,0.55), 0 0 30px -2px rgba(52,211,153,0.55)' }}
-          transition={{ duration: 0.25 }}
-        />
+        <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
+          <motion.rect
+            x="0"
+            y="0"
+            width="100%"
+            height="100%"
+            rx="12"
+            fill="none"
+            stroke="var(--color-secondary)"
+            strokeWidth="2"
+            pathLength={1}
+            strokeDasharray="1"
+            style={{ filter: 'drop-shadow(0 0 5px rgba(34,211,238,0.55))' }}
+            initial={{ strokeDashoffset: 1, opacity: 1 }}
+            animate={{ strokeDashoffset: 0, opacity: [1, 1, 0] }}
+            transition={{
+              strokeDashoffset: { duration: 0.5, ease: EASE },
+              opacity: { duration: 0.95, times: [0, 0.55, 1] },
+            }}
+          />
+        </svg>
       )}
 
       {/* Completion checkbox */}
@@ -83,10 +97,13 @@ const TaskCardBase = forwardRef<HTMLDivElement, TaskCardProps>(function TaskCard
         aria-label={done ? 'Als offen markieren' : 'Als erledigt markieren'}
         className={cn(
           'relative z-10 mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border transition-colors',
-          showChecked
+          done
             ? 'border-success bg-success/25 text-success'
-            : 'border-border-strong text-transparent hover:border-primary hover:text-primary/40',
+            : completing
+              ? 'border-secondary text-secondary'
+              : 'border-border-strong text-transparent hover:border-primary hover:text-primary/40',
         )}
+        style={completing && !done ? { backgroundColor: 'rgba(34, 211, 238, 0.22)' } : undefined}
       >
         <motion.span
           initial={false}
@@ -110,14 +127,6 @@ const TaskCardBase = forwardRef<HTMLDivElement, TaskCardProps>(function TaskCard
             >
               {task.title}
             </p>
-            {completing && (
-              <motion.span
-                className="pointer-events-none absolute left-0 top-1/2 h-[2px] -translate-y-1/2 rounded-full bg-success"
-                initial={{ width: 0 }}
-                animate={{ width: '100%' }}
-                transition={{ duration: 0.3, ease: EASE }}
-              />
-            )}
           </div>
 
           {/* Hover actions */}
