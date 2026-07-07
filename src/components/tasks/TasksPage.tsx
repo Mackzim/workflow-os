@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { Task } from '@/lib/tasks/taskTypes';
 import { useTasks } from '@/hooks/useTasks';
 import { Page, PageHeader } from '@/components/common/Page';
@@ -9,16 +9,27 @@ import { QuickAddTask } from './QuickAddTask';
 import { TaskFilters } from './TaskFilters';
 import { TaskList } from './TaskList';
 import { TaskForm } from './TaskForm';
+import { CompletedSection } from './CompletedSection';
 
 export function TasksPage() {
-  const { tasks, visibleTasks } = useTasks();
+  const { tasks, visibleTasks, filter } = useTasks();
   const [editing, setEditing] = useState<Task | null>(null);
+
+  const { active, done } = useMemo(
+    () => ({
+      active: visibleTasks.filter((t) => t.status !== 'done'),
+      done: visibleTasks.filter((t) => t.status === 'done'),
+    }),
+    [visibleTasks],
+  );
+
+  const openCount = tasks.filter((t) => t.status !== 'done').length;
 
   return (
     <Page>
       <PageHeader
         title="Tasks"
-        subtitle={`${visibleTasks.length} von ${tasks.length} Aufgaben`}
+        subtitle={`${openCount} offen · ${tasks.length - openCount} erledigt`}
         icon={<Icon name="tasks" size={20} />}
       />
 
@@ -30,15 +41,21 @@ export function TasksPage() {
         <TaskFilters />
         <div className="mt-4">
           <TaskList
-            tasks={visibleTasks}
+            tasks={active}
             onEdit={setEditing}
-            emptyTitle={tasks.length === 0 ? 'Noch keine Aufgaben' : 'Keine Treffer'}
+            emptyTitle={tasks.length === 0 ? 'Noch keine Aufgaben' : done.length > 0 ? 'Alles erledigt 🎉' : 'Keine Treffer'}
             emptyDescription={
               tasks.length === 0
                 ? 'Erstelle deine erste Aufgabe über das Feld oben.'
-                : 'Passe Suche oder Filter an.'
+                : done.length > 0
+                  ? 'Keine offenen Aufgaben – erledigte findest du unten.'
+                  : 'Passe Suche oder Filter an.'
             }
           />
+
+          {done.length > 0 && (
+            <CompletedSection tasks={done} onEdit={setEditing} defaultOpen={filter.status === 'done'} />
+          )}
         </div>
       </Card>
 

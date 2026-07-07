@@ -2,14 +2,15 @@ import { motion, useReducedMotion } from 'framer-motion';
 import type { WidgetSize } from '@/lib/widgets/widgetTypes';
 import { useTasks } from '@/hooks/useTasks';
 import { EASE } from '@/lib/motion/motionPresets';
+import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
 import { WidgetShell } from './WidgetShell';
 
 function Stat({ label, value, color }: { label: string; value: number; color: string }) {
   return (
     <div className="rounded-lg border border-border bg-surface px-2.5 py-1.5">
-      <p className="text-lg font-semibold leading-none" style={{ color }}>
-        {value}
-      </p>
+      <span className="block text-lg font-semibold leading-none" style={{ color }}>
+        <AnimatedNumber value={value} />
+      </span>
       <p className="mt-1 text-[10px] uppercase tracking-wide text-content-faint">{label}</p>
     </div>
   );
@@ -45,7 +46,7 @@ export function ProgressWidget({ size }: { size: WidgetSize }) {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-xl font-semibold text-content">{metrics.todayProgress}%</span>
+            <AnimatedNumber value={metrics.todayProgress} suffix="%" className="text-xl font-semibold text-content" />
             <span className="text-[10px] text-content-faint">
               {metrics.completedToday}/{metrics.todayScopeTotal || 0}
             </span>
