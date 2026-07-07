@@ -6,6 +6,11 @@
 [build.environment]
   NODE_VERSION = "20"
 
+# Serverless functions (e.g. the Google Search Console proxy).
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
 # SPA fallback: client-side routes like /tasks or /command must serve index.html
 # on direct load / refresh (react-router handles the rest in the browser).
 [[redirects]]
