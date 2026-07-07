@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import type { NavItem } from './navItems';
-import { NAV_MODULES, NAV_PRIMARY, NAV_SETTINGS } from './navItems';
+import { NAV_ACTIVE, NAV_WIP, NAV_SETTINGS } from './navItems';
 import { sidebarIndicator } from '@/lib/motion/motionPresets';
 import { cn } from '@/lib/utils/cn';
 import { Icon } from '@/components/ui/Icon';
@@ -43,11 +44,51 @@ function NavRow({ item, active, onNavigate }: { item: NavItem; active: boolean; 
   );
 }
 
-function SectionLabel({ children }: { children: string }) {
+function NavGroup({
+  label,
+  items,
+  defaultOpen,
+  pathname,
+  onNavigate,
+}: {
+  label: string;
+  items: NavItem[];
+  defaultOpen: boolean;
+  pathname: string;
+  onNavigate?: () => void;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+
   return (
-    <p className="px-3 pb-1.5 pt-4 text-[10px] font-semibold uppercase tracking-wider text-content-faint">
-      {children}
-    </p>
+    <div>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex w-full items-center justify-between rounded-lg px-3 pb-1 pt-4 text-content-faint transition-colors hover:text-content-muted"
+      >
+        <span className="text-[10px] font-semibold uppercase tracking-wider">{label}</span>
+        <motion.span animate={{ rotate: open ? 0 : -90 }} transition={{ duration: 0.2 }}>
+          <Icon name="chevronDown" size={14} />
+        </motion.span>
+      </button>
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="space-y-0.5">
+              {items.map((it) => (
+                <NavRow key={it.key} item={it} active={isActivePath(pathname, it.path)} onNavigate={onNavigate} />
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -57,14 +98,8 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <nav className="flex h-full flex-col">
       <div className="flex-1 space-y-0.5 overflow-y-auto px-2">
-        {NAV_PRIMARY.map((it) => (
-          <NavRow key={it.key} item={it} active={isActivePath(pathname, it.path)} onNavigate={onNavigate} />
-        ))}
-
-        <SectionLabel>Module</SectionLabel>
-        {NAV_MODULES.map((it) => (
-          <NavRow key={it.key} item={it} active={isActivePath(pathname, it.path)} onNavigate={onNavigate} />
-        ))}
+        <NavGroup label="Aktiv" items={NAV_ACTIVE} defaultOpen pathname={pathname} onNavigate={onNavigate} />
+        <NavGroup label="In Arbeit" items={NAV_WIP} defaultOpen={false} pathname={pathname} onNavigate={onNavigate} />
       </div>
 
       <div className="mt-2 border-t border-border px-2 pt-2">

@@ -19,45 +19,48 @@ export function ProgressWidget() {
   const { metrics } = useTasks();
   const reduced = useReducedMotion();
 
-  const r = 34;
-  const c = 2 * Math.PI * r;
-  const offset = c - (metrics.todayProgress / 100) * c;
+  const done = metrics.completedToday;
+  const total = metrics.todayScopeTotal;
+  const pct = metrics.todayProgress;
+
+  const caption =
+    total === 0
+      ? 'Nichts für heute geplant.'
+      : pct >= 100
+        ? 'Alles erledigt – stark.'
+        : `Noch ${total - done} offen.`;
 
   return (
-    <WidgetShell title="Progress Today" icon="check">
-      <div className="flex items-center gap-4">
-        <div className="relative h-24 w-24 shrink-0">
-          <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
-            <circle cx="50" cy="50" r={r} fill="none" stroke="var(--color-surface-elevated)" strokeWidth="9" />
-            <motion.circle
-              cx="50"
-              cy="50"
-              r={r}
-              fill="none"
-              stroke="var(--color-primary)"
-              strokeWidth="9"
-              strokeLinecap="round"
-              strokeDasharray={c}
-              initial={reduced ? false : { strokeDashoffset: c }}
-              animate={{ strokeDashoffset: offset }}
-              transition={{ duration: 0.8, ease: EASE }}
-              style={{ filter: 'drop-shadow(0 0 6px rgba(76,141,255,0.4))' }}
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <AnimatedNumber value={metrics.todayProgress} suffix="%" className="text-xl font-semibold text-content" />
-            <span className="text-[10px] text-content-faint">
-              {metrics.completedToday}/{metrics.todayScopeTotal || 0}
+    <WidgetShell title="Fortschritt heute" icon="check">
+      <div className="flex h-full flex-col justify-center gap-3.5">
+        <div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-semibold text-content">
+              <AnimatedNumber value={done} />
+            </span>
+            <span className="text-[13px] text-content-muted">von {total} erledigt</span>
+            <span className="ml-auto text-[13px] font-semibold text-primary">
+              <AnimatedNumber value={pct} suffix="%" />
             </span>
           </div>
+
+          <div className="mt-2.5 h-2.5 w-full overflow-hidden rounded-full bg-surface-elevated">
+            <motion.div
+              className="h-full rounded-full bg-gradient-to-r from-primary to-secondary"
+              style={{ boxShadow: '0 0 12px -2px var(--color-primary)' }}
+              initial={reduced ? false : { width: 0 }}
+              animate={{ width: `${pct}%` }}
+              transition={{ duration: 0.8, ease: EASE }}
+            />
+          </div>
+
+          <p className="mt-2 text-[11px] text-content-faint">{caption}</p>
         </div>
 
-        <div className="grid flex-1 grid-cols-1 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           <Stat label="Aktiv" value={metrics.active} color="var(--color-text)" />
-          <div className="grid grid-cols-2 gap-2">
-            <Stat label="Wichtig" value={metrics.highPriority} color="var(--color-warning)" />
-            <Stat label="Überfällig" value={metrics.overdue} color="var(--color-critical)" />
-          </div>
+          <Stat label="Wichtig" value={metrics.highPriority} color="var(--color-warning)" />
+          <Stat label="Überfällig" value={metrics.overdue} color="var(--color-critical)" />
         </div>
       </div>
     </WidgetShell>

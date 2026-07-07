@@ -20,7 +20,7 @@ export const WIDGET_DEFINITIONS: Record<WidgetKind, WidgetDefinition> = {
   },
   progress: {
     kind: 'progress',
-    title: 'Progress Today',
+    title: 'Fortschritt heute',
     description: 'Tagesfortschritt auf einen Blick.',
     placeholder: false,
   },

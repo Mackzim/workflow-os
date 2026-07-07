@@ -1,18 +1,11 @@
 import { useWidgetConfig } from '@/hooks/useWidgetConfig';
-import { formatToday } from '@/lib/utils/format';
 import { cn } from '@/lib/utils/cn';
-import { Page, PageHeader } from '@/components/common/Page';
+import { Page } from '@/components/common/Page';
+import { DashboardHeader } from '@/components/layout/DashboardHeader';
 import { Icon } from '@/components/ui/Icon';
 import { Popover } from '@/components/ui/Popover';
 import { Toggle } from '@/components/ui/Toggle';
 import { WidgetGrid } from './WidgetGrid';
-
-function greeting(ref = new Date()): string {
-  const h = ref.getHours();
-  if (h < 11) return 'Guten Morgen';
-  if (h < 18) return 'Guten Tag';
-  return 'Guten Abend';
-}
 
 function WidgetSettings() {
   const { allOrdered, definitions, orderedEnabled, toggleWidget, resetDashboard } = useWidgetConfig();
@@ -87,9 +80,8 @@ export function DashboardPage() {
 
   return (
     <Page>
-      <PageHeader
-        title={greeting()}
-        subtitle={editing ? 'Ziehen zum Anordnen · Ecke ziehen für Größe' : formatToday()}
+      <DashboardHeader
+        editing={editing}
         actions={
           <>
             <WidgetSettings />

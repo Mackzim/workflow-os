@@ -16,19 +16,19 @@ function item(key: ModuleKey, icon: IconName, ready: boolean): NavItem {
   return { key, icon, ready, label: MODULE_LABELS[key], path: MODULE_ROUTES[key] };
 }
 
-/** Built & usable today. */
-export const NAV_PRIMARY: NavItem[] = [
+/** Built & usable today – the "Aktiv" group. */
+export const NAV_ACTIVE: NavItem[] = [
   item('dashboard', 'dashboard', FEATURES.dashboard),
   item('tasks', 'tasks', FEATURES.tasks),
+  item('calendar', 'calendar', FEATURES.calendar),
   item('command', 'command', FEATURES.commandCenter),
 ];
 
-/** Prepared modules – routed to placeholders. */
-export const NAV_MODULES: NavItem[] = [
+/** Prepared modules routed to placeholders – the "In Arbeit" group. */
+export const NAV_WIP: NavItem[] = [
   item('projects', 'projects', FEATURES.projects),
   item('notes', 'notes', FEATURES.notes),
   item('objects', 'objects', FEATURES.objects),
-  item('calendar', 'calendar', FEATURES.calendar),
   item('automations', 'automations', FEATURES.automations),
   item('integrations', 'integrations', FEATURES.integrations),
 ];
