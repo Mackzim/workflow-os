@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useTaskStore } from '@/store/useTaskStore';
 import { useWidgetStore } from '@/store/useWidgetStore';
@@ -7,7 +7,9 @@ import { APP } from '@/config/app';
 import { Page, PageHeader } from '@/components/common/Page';
 import { Card, CardBody, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { Icon } from '@/components/ui/Icon';
+import { useProfile, nameFromEmail } from '@/hooks/useProfile';
 import { useAuthStore } from '@/store/useAuthStore';
 import { isSyncConfigured } from '@/lib/sync/supabaseClient';
 import { useThemeStore, type Theme } from '@/store/useThemeStore';
@@ -53,6 +55,8 @@ export function SettingsPage() {
       <PageHeader title="Settings" subtitle="App, Daten & Darstellung" icon={<Icon name="settings" size={20} />} />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <ProfileCard />
+
         {isSyncConfigured && (
           <Card className="lg:col-span-2">
             <CardHeader>
@@ -159,6 +163,49 @@ export function SettingsPage() {
         </Card>
       </div>
     </Page>
+  );
+}
+
+function ProfileCard() {
+  const { nickname, email, setNickname } = useProfile();
+  const [value, setValue] = useState(nickname);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => setValue(nickname), [nickname]);
+
+  const save = () => {
+    void setNickname(value);
+    setSaved(true);
+    window.setTimeout(() => setSaved(false), 1500);
+  };
+
+  return (
+    <Card className="lg:col-span-2">
+      <CardHeader>
+        <CardTitle>Profil</CardTitle>
+      </CardHeader>
+      <CardBody className="space-y-3">
+        <p className="text-[13px] text-content-muted">
+          Anzeigename für die Begrüßung. Leer lassen = Name aus deiner E-Mail
+          {email ? ` (${email})` : ''}.
+        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <Input
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') save();
+            }}
+            placeholder={nameFromEmail(email) ?? 'Dein Name'}
+            className="max-w-xs"
+          />
+          <Button size="sm" variant="secondary" onClick={save}>
+            Speichern
+          </Button>
+          {saved && <span className="text-[12px] text-success">Gespeichert.</span>}
+        </div>
+      </CardBody>
+    </Card>
   );
 }
 

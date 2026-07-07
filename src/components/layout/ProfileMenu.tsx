@@ -1,15 +1,11 @@
 import { Link } from 'react-router-dom';
-import { useShallow } from 'zustand/react/shallow';
-import { useAuthStore } from '@/store/useAuthStore';
 import { useThemeStore, type Theme } from '@/store/useThemeStore';
 import { isSyncConfigured } from '@/lib/sync/supabaseClient';
+import { useProfile } from '@/hooks/useProfile';
 import { cn } from '@/lib/utils/cn';
 import { Popover } from '@/components/ui/Popover';
 import { Icon } from '@/components/ui/Icon';
 import { BrandMark } from './Brand';
-
-// TODO(profile): editable display name + avatar upload land with the profile store.
-const USER_NAME = 'Felix';
 
 function ThemeSwitch() {
   const theme = useThemeStore((s) => s.theme);
@@ -39,8 +35,9 @@ function ThemeSwitch() {
 }
 
 export function ProfileMenu() {
-  const { user } = useAuthStore(useShallow((s) => ({ user: s.user })));
-  const secondary = isSyncConfigured ? (user?.email ?? 'Nicht angemeldet') : 'Lokaler Modus';
+  const { displayName, email } = useProfile();
+  const name = displayName || 'Profil';
+  const secondary = isSyncConfigured ? (email ?? 'Nicht angemeldet') : 'Lokaler Modus';
 
   return (
     <Popover
@@ -57,7 +54,7 @@ export function ProfileMenu() {
           <div className="flex items-center gap-3 px-1.5 pb-2.5 pt-1">
             <BrandMark size={40} />
             <div className="min-w-0">
-              <p className="truncate text-[13px] font-semibold text-content">{USER_NAME}</p>
+              <p className="truncate text-[13px] font-semibold text-content">{name}</p>
               <p className="truncate text-[11px] text-content-faint">{secondary}</p>
             </div>
           </div>

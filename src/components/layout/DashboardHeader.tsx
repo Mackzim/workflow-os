@@ -2,9 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { EASE } from '@/lib/motion/motionPresets';
 import { cn } from '@/lib/utils/cn';
-
-// TODO(profile): pull from the profile store once account settings land.
-const USER_NAME = 'Felix';
+import { useProfile } from '@/hooks/useProfile';
 
 function greeting(ref = new Date()): string {
   const h = ref.getHours();
@@ -38,6 +36,7 @@ export interface DashboardHeaderProps {
 export function DashboardHeader({ actions, editing }: DashboardHeaderProps) {
   const reduced = useReducedMotion();
   const { date, time } = useClock();
+  const { displayName } = useProfile();
 
   return (
     <motion.header
@@ -72,7 +71,8 @@ export function DashboardHeader({ actions, editing }: DashboardHeaderProps) {
             transition={{ duration: 0.4, ease: EASE, delay: 0.12 }}
             className="text-xl font-semibold tracking-tight text-content sm:text-2xl"
           >
-            {greeting()}, {USER_NAME}
+            {greeting()}
+            {displayName ? `, ${displayName}` : ''}
           </motion.h1>
           <motion.p
             initial={reduced ? false : { opacity: 0 }}

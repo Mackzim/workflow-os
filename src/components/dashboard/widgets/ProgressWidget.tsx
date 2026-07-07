@@ -19,16 +19,18 @@ export function ProgressWidget() {
   const { metrics } = useTasks();
   const reduced = useReducedMotion();
 
+  // Progress across the current workload: how many of your open tasks you've
+  // already knocked out today. Denominator stays stable as you complete them.
   const done = metrics.completedToday;
-  const total = metrics.todayScopeTotal;
-  const pct = metrics.todayProgress;
+  const total = metrics.active + metrics.completedToday;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
   const caption =
     total === 0
-      ? 'Nichts für heute geplant.'
+      ? 'Keine Aufgaben offen.'
       : pct >= 100
         ? 'Alles erledigt – stark.'
-        : `Noch ${total - done} offen.`;
+        : `Noch ${metrics.active} offen.`;
 
   return (
     <WidgetShell title="Fortschritt heute" icon="check">
