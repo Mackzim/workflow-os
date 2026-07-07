@@ -254,7 +254,7 @@ const SETUP: Record<string, { title: string; hint: string }> = {
   },
   unreachable: {
     title: 'Function nicht erreichbar',
-    hint: 'Die SEO-Function antwortet nicht. Lokal (npm run dev) gibt es keine Netlify-Functions – das klappt erst auf der deployten Seite.',
+    hint: 'Die SEO-Function antwortet nicht. Lokal (npm run dev) laufen die Functions nicht – das klappt erst auf der deployten Seite.',
   },
   error: { title: 'Fehler beim Abruf', hint: 'Beim Laden der Search-Console-Daten ging etwas schief.' },
 };

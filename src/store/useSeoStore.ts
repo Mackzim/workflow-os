@@ -36,7 +36,7 @@ export const useSeoStore = create<SeoState>()(
 
         set({ loading: true, days: d });
         try {
-          const res = await fetch(`/.netlify/functions/seo?days=${d}`, { headers: { accept: 'application/json' } });
+          const res = await fetch(`/api/seo?days=${d}`, { headers: { accept: 'application/json' } });
           const report = (await res.json()) as SeoReport;
           set({ report, fetchedAt: Date.now(), loading: false });
         } catch (e) {
