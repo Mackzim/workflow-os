@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from '@/components/layout/AppShell';
 import { DashboardPage } from '@/components/dashboard/DashboardPage';
 import { TasksPage } from '@/components/tasks/TasksPage';
+import { CalendarPage } from '@/components/calendar/CalendarPage';
 import { CommandCenterPage } from '@/components/command/CommandCenterPage';
 import { SettingsPage } from '@/components/settings/SettingsPage';
 import { PlaceholderPage } from '@/components/common/PlaceholderPage';
@@ -61,18 +62,7 @@ export function AppRoutes() {
             />
           }
         />
-        <Route
-          path="calendar"
-          element={
-            <PlaceholderPage
-              title="Calendar"
-              description="Termine & fällige Aufgaben im Blick."
-              icon="calendar"
-              targetVersion="v0.4"
-              planned={['Monats- & Wochenansicht', 'Fällige Tasks im Kalender', 'Termin-Erfassung', 'Kalender-Integrationen']}
-            />
-          }
-        />
+        <Route path="calendar" element={<CalendarPage />} />
         <Route
           path="automations"
           element={

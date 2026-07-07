@@ -2,6 +2,7 @@ import { cloneElement, useEffect } from 'react';
 import { useLocation, useOutlet } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { useTaskStore } from '@/store/useTaskStore';
+import { useCalendarStore } from '@/store/useCalendarStore';
 import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { MobileDrawer } from './MobileDrawer';
@@ -15,11 +16,13 @@ export function AppShell() {
   const outlet = useOutlet();
   const location = useLocation();
   const ensureSeeded = useTaskStore((s) => s.ensureSeeded);
+  const ensureEventsSeeded = useCalendarStore((s) => s.ensureSeeded);
 
-  // Seed onboarding content once, after the persisted store has rehydrated.
+  // Seed onboarding content once, after the persisted stores have rehydrated.
   useEffect(() => {
     ensureSeeded();
-  }, [ensureSeeded]);
+    ensureEventsSeeded();
+  }, [ensureSeeded, ensureEventsSeeded]);
 
   return (
     <div className="flex h-screen overflow-hidden bg-bg text-content">

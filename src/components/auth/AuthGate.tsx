@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { isSyncConfigured } from '@/lib/sync/supabaseClient';
 import { startSync, stopSync } from '@/lib/sync/syncEngine';
+import { startCalendarSync, stopCalendarSync } from '@/lib/sync/calendarSync';
 import { BrandMark } from '@/components/layout/Brand';
 import { LoginScreen } from './LoginScreen';
 
@@ -22,8 +23,13 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!isSyncConfigured) return;
-    if (status === 'signedIn' && userId) startSync(userId);
-    else if (status === 'signedOut') stopSync();
+    if (status === 'signedIn' && userId) {
+      startSync(userId);
+      startCalendarSync(userId);
+    } else if (status === 'signedOut') {
+      stopSync();
+      stopCalendarSync();
+    }
   }, [status, userId]);
 
   if (!isSyncConfigured) return <>{children}</>;

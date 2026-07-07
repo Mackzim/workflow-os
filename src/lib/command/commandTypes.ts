@@ -12,6 +12,7 @@
 
 import type { Task } from '@/lib/tasks/taskTypes';
 import type { DashboardMetrics } from '@/lib/tasks/taskMetrics';
+import type { CalendarEvent, EventDraft } from '@/lib/calendar/calendarTypes';
 import type { ModuleKey } from '@/lib/navigation/navigation';
 
 export type ActionId =
@@ -23,11 +24,12 @@ export type ActionId =
   | 'getOpenTasks'
   | 'getTodayTasks'
   | 'summarizeToday'
+  | 'createEvent'
   | 'configureWidget'
   | 'openModule'
   | 'createAutomation';
 
-export type ActionCategory = 'task' | 'query' | 'navigation' | 'automation' | 'widget';
+export type ActionCategory = 'task' | 'query' | 'navigation' | 'automation' | 'widget' | 'calendar';
 
 /** Lightweight param descriptor – later convertible to a Claude tool schema. */
 export interface ActionParam {
@@ -67,6 +69,9 @@ export interface ActionContext {
   getOpenTasks: () => Task[];
   getTodayTasks: () => Task[];
   getMetrics: () => DashboardMetrics;
+  /** Calendar (time-blocking / Claude-planned events). */
+  createEvent: (draft: EventDraft) => CalendarEvent;
+  getEvents: () => CalendarEvent[];
   /** Optional navigation hook (provided by the Command Center UI). */
   navigate?: (path: string) => void;
 }

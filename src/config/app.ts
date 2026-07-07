@@ -17,11 +17,11 @@ export const FEATURES = {
   tasks: true,
   dashboard: true,
   commandCenter: true,
+  calendar: true,
   // Prepared but not implemented in 0.1.0:
   projects: false,
   notes: false,
   objects: false,
-  calendar: false,
   automations: false,
   integrations: false,
 } as const;

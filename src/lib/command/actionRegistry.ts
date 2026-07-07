@@ -13,6 +13,8 @@
 
 import type { Priority, Task, TaskStatus } from '@/lib/tasks/taskTypes';
 import { PRIORITIES, STATUSES, STATUS_META, PRIORITY_META } from '@/lib/tasks/taskTypes';
+import type { EventColor } from '@/lib/calendar/calendarTypes';
+import { EVENT_COLORS } from '@/lib/calendar/calendarTypes';
 import { MODULE_ROUTES, MODULE_LABELS, resolveModule } from '@/lib/navigation/navigation';
 import type {
   ActionContext,
@@ -225,6 +227,49 @@ const summarizeTodayAction: ActionDefinition<Record<string, never>> = {
   },
 };
 
+const createEventAction: ActionDefinition<{
+  title: string;
+  start: string;
+  end?: string;
+  allDay?: boolean;
+  color?: EventColor;
+  description?: string;
+}> = {
+  id: 'createEvent',
+  title: 'Termin erstellen',
+  description: 'Legt einen Kalendertermin an (auch für Time-Blocking von Aufgaben).',
+  category: 'calendar',
+  implemented: true,
+  params: [
+    { name: 'title', type: 'string', required: true, description: 'Titel des Termins' },
+    { name: 'start', type: 'string', required: true, description: 'Start (ISO-Datum/-Zeit)' },
+    { name: 'end', type: 'string', required: false, description: 'Ende (ISO-Datum/-Zeit)' },
+    { name: 'allDay', type: 'boolean', required: false, description: 'Ganztägig?' },
+    { name: 'color', type: 'enum', required: false, description: 'Farbe', options: Object.keys(EVENT_COLORS) },
+    { name: 'description', type: 'string', required: false, description: 'Notizen' },
+  ],
+  validate: (input) => {
+    const r = asRecord(input);
+    const title = typeof r.title === 'string' ? r.title.trim() : '';
+    if (!title) return fail('Ein Titel wird benötigt.');
+    const start = typeof r.start === 'string' ? r.start : '';
+    if (!start || Number.isNaN(new Date(start).getTime())) return fail('Ein gültiges Startdatum wird benötigt.');
+    const color = typeof r.color === 'string' && r.color in EVENT_COLORS ? (r.color as EventColor) : undefined;
+    return ok({
+      title,
+      start,
+      end: typeof r.end === 'string' ? r.end : undefined,
+      allDay: typeof r.allDay === 'boolean' ? r.allDay : undefined,
+      color,
+      description: typeof r.description === 'string' ? r.description : undefined,
+    });
+  },
+  run: (input, ctx): ActionResult => {
+    const event = ctx.createEvent(input);
+    return { ok: true, message: `Termin „${event.title}" erstellt.`, data: event };
+  },
+};
+
 const openModuleAction: ActionDefinition<{ module: string }> = {
   id: 'openModule',
   title: 'Modul öffnen',
@@ -295,6 +340,7 @@ const DEFINITIONS: ActionDefinition<any>[] = [
   getOpenTasksAction,
   getTodayTasksAction,
   summarizeTodayAction,
+  createEventAction,
   openModuleAction,
   configureWidgetAction,
   createAutomationAction,

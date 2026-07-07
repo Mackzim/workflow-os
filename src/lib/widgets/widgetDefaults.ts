@@ -50,9 +50,9 @@ export const WIDGET_DEFINITIONS: Record<WidgetKind, WidgetDefinition> = {
   },
   upcoming: {
     kind: 'upcoming',
-    title: 'Upcoming',
-    description: 'Kalender & Termine – kommt in einer späteren Version.',
-    placeholder: true,
+    title: 'Anstehend',
+    description: 'Nächste Termine & fällige Aufgaben.',
+    placeholder: false,
   },
   notes: {
     kind: 'notes',

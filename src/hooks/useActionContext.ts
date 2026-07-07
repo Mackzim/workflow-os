@@ -10,6 +10,7 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTaskStore } from '@/store/useTaskStore';
+import { useCalendarStore } from '@/store/useCalendarStore';
 import { computeMetrics } from '@/lib/tasks/taskMetrics';
 import type { ActionContext } from '@/lib/command/commandTypes';
 
@@ -25,6 +26,8 @@ export function useActionContext(): ActionContext {
       getOpenTasks: () => useTaskStore.getState().getOpenTasks(),
       getTodayTasks: () => useTaskStore.getState().getTodayTasks(),
       getMetrics: () => computeMetrics(useTaskStore.getState().tasks),
+      createEvent: (draft) => useCalendarStore.getState().addEvent(draft),
+      getEvents: () => useCalendarStore.getState().events,
       navigate: (path) => navigate(path),
     }),
     [navigate],

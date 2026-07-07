@@ -21,6 +21,7 @@ import { HighPriorityWidget } from './widgets/HighPriorityWidget';
 import { ProgressWidget } from './widgets/ProgressWidget';
 import { QuickAddWidget } from './widgets/QuickAddWidget';
 import { CommandWidget } from './widgets/CommandWidget';
+import { UpcomingWidget } from './widgets/UpcomingWidget';
 import { PlaceholderWidget } from './widgets/PlaceholderWidget';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -40,6 +41,8 @@ function renderWidget(kind: WidgetKind, def: WidgetDefinition) {
       return <QuickAddWidget />;
     case 'command':
       return <CommandWidget />;
+    case 'upcoming':
+      return <UpcomingWidget />;
     default:
       return <PlaceholderWidget def={def} />;
   }
