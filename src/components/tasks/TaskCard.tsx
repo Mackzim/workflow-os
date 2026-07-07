@@ -1,4 +1,4 @@
-import { forwardRef, memo } from 'react';
+import { forwardRef, memo, useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useShallow } from 'zustand/react/shallow';
 import type { Priority, Task, TaskStatus } from '@/lib/tasks/taskTypes';
@@ -7,7 +7,7 @@ import { isOverdue } from '@/lib/tasks/taskUtils';
 import { useTaskStore } from '@/store/useTaskStore';
 import { cn } from '@/lib/utils/cn';
 import { formatDueDate } from '@/lib/utils/format';
-import { taskCreate } from '@/lib/motion/motionPresets';
+import { EASE, taskCreate } from '@/lib/motion/motionPresets';
 import { Icon } from '@/components/ui/Icon';
 import { IconButton } from '@/components/ui/IconButton';
 import { Popover } from '@/components/ui/Popover';
@@ -35,6 +35,22 @@ const TaskCardBase = forwardRef<HTMLDivElement, TaskCardProps>(function TaskCard
   const overdue = isOverdue(task);
   const dueLabel = formatDueDate(task.dueDate);
 
+  // Completion sequence: glow + strike, then let the card leave (fade out).
+  const [completing, setCompleting] = useState(false);
+  const timeoutRef = useRef<number | null>(null);
+  useEffect(() => () => { if (timeoutRef.current) window.clearTimeout(timeoutRef.current); }, []);
+
+  const showChecked = done || completing;
+  const handleToggle = () => {
+    if (done || reduced) {
+      toggleDone(task.id);
+      return;
+    }
+    if (completing) return;
+    setCompleting(true);
+    timeoutRef.current = window.setTimeout(() => toggleDone(task.id), 460);
+  };
+
   return (
     <motion.div
       ref={ref}
@@ -49,38 +65,60 @@ const TaskCardBase = forwardRef<HTMLDivElement, TaskCardProps>(function TaskCard
         done && 'opacity-60',
       )}
     >
+      {/* Completion glow */}
+      {completing && (
+        <motion.div
+          className="pointer-events-none absolute inset-0 rounded-xl"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          style={{ boxShadow: '0 0 0 1px rgba(52,211,153,0.55), 0 0 30px -2px rgba(52,211,153,0.55)' }}
+          transition={{ duration: 0.25 }}
+        />
+      )}
+
       {/* Completion checkbox */}
       <button
         type="button"
-        onClick={() => toggleDone(task.id)}
+        onClick={handleToggle}
         aria-label={done ? 'Als offen markieren' : 'Als erledigt markieren'}
         className={cn(
-          'mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border transition-colors',
-          done
-            ? 'border-success bg-success/20 text-success'
+          'relative z-10 mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border transition-colors',
+          showChecked
+            ? 'border-success bg-success/25 text-success'
             : 'border-border-strong text-transparent hover:border-primary hover:text-primary/40',
         )}
       >
         <motion.span
           initial={false}
-          animate={done && !reduced ? { scale: [1, 1.25, 1] } : { scale: 1 }}
-          transition={{ duration: 0.3 }}
+          animate={showChecked && !reduced ? { scale: [1, 1.3, 1] } : { scale: 1 }}
+          transition={{ duration: 0.32 }}
         >
           <Icon name="check" size={14} strokeWidth={2.6} />
         </motion.span>
       </button>
 
       {/* Body */}
-      <div className="min-w-0 flex-1">
+      <div className="relative z-10 min-w-0 flex-1">
         <div className="flex items-start justify-between gap-2">
-          <p
-            className={cn(
-              'text-sm font-medium leading-snug text-content',
-              done && 'line-through text-content-muted',
+          <div className="relative min-w-0 flex-1">
+            <p
+              className={cn(
+                'text-sm font-medium leading-snug text-content transition-colors',
+                (done || completing) && 'text-content-muted',
+                done && 'line-through',
+              )}
+            >
+              {task.title}
+            </p>
+            {completing && (
+              <motion.span
+                className="pointer-events-none absolute left-0 top-1/2 h-[2px] -translate-y-1/2 rounded-full bg-success"
+                initial={{ width: 0 }}
+                animate={{ width: '100%' }}
+                transition={{ duration: 0.3, ease: EASE }}
+              />
             )}
-          >
-            {task.title}
-          </p>
+          </div>
 
           {/* Hover actions */}
           <div className="flex items-center gap-0.5 opacity-0 transition-opacity duration-150 group-hover:opacity-100 focus-within:opacity-100">
@@ -90,7 +128,9 @@ const TaskCardBase = forwardRef<HTMLDivElement, TaskCardProps>(function TaskCard
         </div>
 
         {task.description && (
-          <p className="mt-0.5 truncate text-[13px] text-content-muted">{task.description}</p>
+          <p className="mt-0.5 line-clamp-1 break-words text-[13px] text-content-muted group-hover:line-clamp-none">
+            {task.description}
+          </p>
         )}
 
         {/* Meta row */}

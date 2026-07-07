@@ -66,9 +66,10 @@ export const taskCreate: Variants = {
   },
   exit: {
     opacity: 0,
-    x: 12,
+    scale: 0.94,
     height: 0,
-    transition: { duration: DURATION.fast, ease: EASE },
+    marginTop: 0,
+    transition: { duration: DURATION.slow, ease: EASE },
   },
 };
 

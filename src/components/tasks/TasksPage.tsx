@@ -54,7 +54,11 @@ export function TasksPage() {
           />
 
           {done.length > 0 && (
-            <CompletedSection tasks={done} onEdit={setEditing} defaultOpen={filter.status === 'done'} />
+            <CompletedSection
+              tasks={done}
+              onEdit={setEditing}
+              defaultOpen={filter.status.length === 1 && filter.status[0] === 'done'}
+            />
           )}
         </div>
       </Card>

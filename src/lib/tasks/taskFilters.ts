@@ -11,16 +11,18 @@ export type SortDir = 'asc' | 'desc';
 
 export interface TaskFilter {
   search: string;
-  status: TaskStatus | 'all';
-  priority: Priority | 'all';
+  /** Selected statuses – empty array means "all". */
+  status: TaskStatus[];
+  /** Selected priorities – empty array means "all". */
+  priority: Priority[];
   /** Quick scope presets for the dashboard / task page. */
   scope: 'all' | 'today' | 'overdue' | 'active';
 }
 
 export const DEFAULT_FILTER: TaskFilter = {
   search: '',
-  status: 'all',
-  priority: 'all',
+  status: [],
+  priority: [],
   scope: 'all',
 };
 
@@ -59,8 +61,8 @@ export function filterTasks(tasks: Task[], filter: TaskFilter): Task[] {
   return tasks.filter(
     (t) =>
       matchesSearch(t, filter.search) &&
-      (filter.status === 'all' || t.status === filter.status) &&
-      (filter.priority === 'all' || t.priority === filter.priority) &&
+      (filter.status.length === 0 || filter.status.includes(t.status)) &&
+      (filter.priority.length === 0 || filter.priority.includes(t.priority)) &&
       matchesScope(t, filter.scope),
   );
 }
