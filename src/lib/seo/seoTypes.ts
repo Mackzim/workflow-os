@@ -17,7 +17,12 @@ export interface SeoSeriesPoint {
   date: string;
   clicks: number;
   impressions: number;
+  ctr: number;
+  position: number;
 }
+
+/** The four Search Console metrics – used for chart metric toggles. */
+export type SeoMetric = 'clicks' | 'impressions' | 'ctr' | 'position';
 
 export interface SeoQueryRow {
   query: string;
@@ -59,20 +64,35 @@ export type SeoNotConnectedReason =
   | 'unreachable'
   | 'error';
 
-/** Full report returned by the Netlify function. */
+/** Full report returned by the Search Console function. */
 export interface SeoReport {
   connected: boolean;
   reason?: SeoNotConnectedReason;
   status?: number;
   error?: string;
   siteUrl?: string;
-  days?: number;
+  type?: string;
+  compare?: boolean;
   range?: { start: string; end: string };
+  prevRange?: { start: string; end: string };
   kpis?: SeoKpis;
   deltas?: Partial<Record<keyof SeoKpis, number>>;
   series?: SeoSeriesPoint[];
+  prevSeries?: SeoSeriesPoint[];
   topQueries?: SeoQueryRow[];
   topPages?: SeoPageRow[];
   devices?: SeoDeviceRow[];
   countries?: SeoCountryRow[];
+}
+
+/** Query params the explorer sends to /api/seo. */
+export interface SeoQueryParams {
+  days?: number;
+  start?: string;
+  end?: string;
+  compare?: boolean;
+  type?: string;
+  qf?: string;
+  qop?: 'contains' | 'equals' | 'notContains' | 'regex';
+  pf?: string;
 }
