@@ -29,10 +29,16 @@ export function useCalendar() {
     [events, tasks, showDoneTasks],
   );
 
+  // Single-day items only — the month grid renders multi-day events as bars.
+  const dayChips = useCallback(
+    (day: Date): CalendarItem[] => collectDayItems(events, tasks, day, showDoneTasks, true),
+    [events, tasks, showDoneTasks],
+  );
+
   const upcoming = useCallback(
     (from: Date, limit?: number): CalendarItem[] => collectUpcoming(events, tasks, from, limit),
     [events, tasks],
   );
 
-  return { events, tasks, showDoneTasks, itemsForDay, upcoming, ...actions };
+  return { events, tasks, showDoneTasks, itemsForDay, dayChips, upcoming, ...actions };
 }

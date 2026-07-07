@@ -132,15 +132,29 @@ export function eventOnDay(ev: CalendarEvent, day: Date): boolean {
   return d >= s && d <= e;
 }
 
-/** Day view: all-day/tasks first, then timed events by start. */
+/** True if the event covers more than one calendar day (rendered as a bar). */
+export function isMultiDayEvent(ev: CalendarEvent): boolean {
+  return startOfDay(new Date(ev.end)).getTime() > startOfDay(new Date(ev.start)).getTime();
+}
+
+/**
+ * Day view: all-day/tasks first, then timed events by start.
+ * `excludeMultiDay` skips events that span multiple days — the month grid draws
+ * those as continuous bars instead of a chip per day.
+ */
 export function collectDayItems(
   events: CalendarEvent[],
   tasks: Task[],
   day: Date,
   includeDoneTasks = false,
+  excludeMultiDay = false,
 ): CalendarItem[] {
   const items: CalendarItem[] = [];
-  for (const ev of events) if (eventOnDay(ev, day)) items.push(eventToItem(ev));
+  for (const ev of events) {
+    if (!eventOnDay(ev, day)) continue;
+    if (excludeMultiDay && isMultiDayEvent(ev)) continue;
+    items.push(eventToItem(ev));
+  }
   for (const t of tasks) {
     if (!t.dueDate || !isSameDay(new Date(t.dueDate), day)) continue;
     if (t.status === 'done' && !includeDoneTasks) continue;

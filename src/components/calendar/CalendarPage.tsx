@@ -13,7 +13,8 @@ import { DayPanel } from './DayPanel';
 import { EventModal, type EventFormValues } from './EventModal';
 
 export function CalendarPage() {
-  const { events, itemsForDay, addEvent, updateEvent, deleteEvent, showDoneTasks, setShowDoneTasks } = useCalendar();
+  const { events, itemsForDay, dayChips, addEvent, updateEvent, deleteEvent, showDoneTasks, setShowDoneTasks } =
+    useCalendar();
   const navigate = useNavigate();
 
   const [cursor, setCursor] = useState(() => new Date());
@@ -99,9 +100,14 @@ export function CalendarPage() {
         <MonthGrid
           cursor={cursor}
           selected={selected}
-          itemsForDay={itemsForDay}
+          events={events}
+          dayChips={dayChips}
           onSelectDay={selectDay}
           onOpenItem={openItem}
+          onOpenEvent={(ev) => {
+            setEditing(ev);
+            setModalOpen(true);
+          }}
         />
         <DayPanel
           day={selected}
