@@ -1,8 +1,8 @@
 import { useWidgetConfig } from '@/hooks/useWidgetConfig';
 import { formatToday } from '@/lib/utils/format';
+import { cn } from '@/lib/utils/cn';
 import { Page, PageHeader } from '@/components/common/Page';
 import { Icon } from '@/components/ui/Icon';
-import { IconButton } from '@/components/ui/IconButton';
 import { Popover } from '@/components/ui/Popover';
 import { Toggle } from '@/components/ui/Toggle';
 import { WidgetGrid } from './WidgetGrid';
@@ -15,7 +15,7 @@ function greeting(ref = new Date()): string {
 }
 
 function WidgetSettings() {
-  const { allOrdered, definitions, toggleWidget, moveWidget, resetWidgets } = useWidgetConfig();
+  const { allOrdered, definitions, orderedEnabled, toggleWidget, resetDashboard } = useWidgetConfig();
 
   return (
     <Popover
@@ -32,36 +32,18 @@ function WidgetSettings() {
       {() => (
         <div>
           <div className="flex items-center justify-between px-1.5 pb-1.5">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-content-faint">Widgets anpassen</p>
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-content-faint">Widgets</p>
             <button
               type="button"
-              onClick={resetWidgets}
+              onClick={resetDashboard}
               className="text-[11px] text-content-faint transition-colors hover:text-primary"
             >
-              Zurücksetzen
+              Layout zurücksetzen
             </button>
           </div>
           <div className="max-h-[60vh] space-y-0.5 overflow-y-auto">
-            {allOrdered.map((w, i) => (
-              <div key={w.kind} className="flex items-center gap-2 rounded-lg px-1.5 py-1 hover:bg-surface-hover">
-                <div className="flex flex-col">
-                  <IconButton
-                    icon="chevronUp"
-                    label="Nach oben"
-                    size={13}
-                    className="h-4"
-                    disabled={i === 0}
-                    onClick={() => moveWidget(w.kind, -1)}
-                  />
-                  <IconButton
-                    icon="chevronDown"
-                    label="Nach unten"
-                    size={13}
-                    className="h-4"
-                    disabled={i === allOrdered.length - 1}
-                    onClick={() => moveWidget(w.kind, 1)}
-                  />
-                </div>
+            {allOrdered.map((w) => (
+              <div key={w.kind} className="flex items-center gap-2 rounded-lg px-1.5 py-1.5 hover:bg-surface-hover">
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-[13px] text-content">{definitions[w.kind].title}</p>
                   {definitions[w.kind].placeholder && (
@@ -72,19 +54,48 @@ function WidgetSettings() {
               </div>
             ))}
           </div>
+          <p className="px-1.5 pt-2 text-[10px] text-content-faint">
+            {orderedEnabled.length} aktiv · Anordnen &amp; Größe über „Anpassen“.
+          </p>
         </div>
       )}
     </Popover>
   );
 }
 
+function EditToggle() {
+  const { editing, setEditing } = useWidgetConfig();
+  return (
+    <button
+      type="button"
+      onClick={() => setEditing(!editing)}
+      className={cn(
+        'inline-flex h-8 items-center gap-1.5 rounded-lg border px-3 text-[13px] font-medium transition-colors',
+        editing
+          ? 'border-primary bg-primary text-white hover:bg-primary-strong'
+          : 'border-border-strong bg-surface-elevated text-content hover:bg-surface-hover',
+      )}
+    >
+      <Icon name={editing ? 'check' : 'edit'} size={15} />
+      {editing ? 'Fertig' : 'Anpassen'}
+    </button>
+  );
+}
+
 export function DashboardPage() {
+  const { editing } = useWidgetConfig();
+
   return (
     <Page>
       <PageHeader
         title={greeting()}
-        subtitle={formatToday()}
-        actions={<WidgetSettings />}
+        subtitle={editing ? 'Ziehen zum Anordnen · Ecke ziehen für Größe' : formatToday()}
+        actions={
+          <>
+            <WidgetSettings />
+            <EditToggle />
+          </>
+        }
       />
       <WidgetGrid />
     </Page>

@@ -1,10 +1,9 @@
 import { useMemo } from 'react';
-import type { WidgetSize } from '@/lib/widgets/widgetTypes';
 import { useTasks } from '@/hooks/useTasks';
 import { WidgetShell } from './WidgetShell';
 import { TaskList } from '@/components/tasks/TaskList';
 
-export function HighPriorityWidget({ size }: { size: WidgetSize }) {
+export function HighPriorityWidget() {
   const { tasks } = useTasks();
   const high = useMemo(
     () =>
@@ -16,7 +15,7 @@ export function HighPriorityWidget({ size }: { size: WidgetSize }) {
   );
 
   return (
-    <WidgetShell title="High Priority" icon="alert" size={size} subtitle={`${high.length} offen`} to="/tasks">
+    <WidgetShell title="High Priority" icon="alert" subtitle={`${high.length} offen`} to="/tasks">
       <TaskList
         tasks={high}
         emptyTitle="Alles im grünen Bereich"

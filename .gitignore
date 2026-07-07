@@ -37,3 +37,6 @@ pnpm-debug.log*
 
 # TypeScript incremental build cache
 *.tsbuildinfo
+
+# Local preview tooling
+.claude/

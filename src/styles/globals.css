@@ -5,9 +5,11 @@
 /* ============================================================
    Design Tokens
    Single source of truth for the visual language.
-   Swap these to re-theme the whole app.
+   Two themes share the same variable names; only the values swap.
+   `data-theme` on <html> selects one (set pre-paint in index.html).
    ============================================================ */
-:root {
+:root,
+:root[data-theme='dark'] {
   /* Surfaces – near-black anthracite base */
   --color-bg: #0a0b0e;
   --color-bg-soft: #0d0f14;
@@ -35,14 +37,66 @@
   --color-warning: #f5b056;
   --color-critical: #fb6e6e;
 
-  /* Priority scale 1..5 (low -> critical) */
-  --prio-1: #6b7688;
-  --prio-2: #5b9bff;
-  --prio-3: #22d3ee;
-  --prio-4: #f5b056;
-  --prio-5: #fb6e6e;
+  /* Priority scale 1..5 (low -> critical): calm -> hot, no blue */
+  --prio-1: #cbd5e1;
+  --prio-2: #5fd08a;
+  --prio-3: #ecc94b;
+  --prio-4: #f2994a;
+  --prio-5: #f2564b;
+
+  /* Elevation shadows (theme-aware so light mode stays soft) */
+  --shadow-card: 0 1px 0 0 rgba(255, 255, 255, 0.02) inset, 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  --shadow-card-hover: 0 1px 0 0 rgba(255, 255, 255, 0.04) inset, 0 16px 40px -16px rgba(0, 0, 0, 0.7);
+
+  /* Ambient page glows */
+  --glow-a: rgba(76, 141, 255, 0.06);
+  --glow-b: rgba(34, 211, 238, 0.04);
 
   color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  /* Surfaces – soft cool light, cards pure white */
+  --color-bg: #eef1f7;
+  --color-bg-soft: #e7ebf3;
+  --color-surface: #ffffff;
+  --color-surface-elevated: #f5f7fb;
+  --color-surface-hover: #edf1f8;
+
+  /* Borders */
+  --color-border: #e3e8f0;
+  --color-border-strong: #cbd3e1;
+
+  /* Brand – slightly stronger blue for contrast on white */
+  --color-primary: #2f6bff;
+  --color-primary-strong: #1f56e6;
+  --color-primary-soft: rgba(47, 107, 255, 0.1);
+  --color-secondary: #0e9bbb;
+
+  /* Text – near-black, not pure black */
+  --color-text: #1a2130;
+  --color-text-muted: #57617a;
+  --color-text-faint: #8790a3;
+
+  /* Semantic states – deepened for white backgrounds */
+  --color-success: #0f9d6e;
+  --color-warning: #d9822b;
+  --color-critical: #e2504f;
+
+  /* Priority scale 1..5 – same idea, darkened so P1 is visible on white */
+  --prio-1: #94a3b8;
+  --prio-2: #1fa971;
+  --prio-3: #d99a12;
+  --prio-4: #e07a2c;
+  --prio-5: #e2504f;
+
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 10px 24px -14px rgba(16, 24, 40, 0.18);
+  --shadow-card-hover: 0 2px 6px rgba(16, 24, 40, 0.07), 0 18px 40px -18px rgba(16, 24, 40, 0.22);
+
+  --glow-a: rgba(47, 107, 255, 0.06);
+  --glow-b: rgba(14, 155, 187, 0.05);
+
+  color-scheme: light;
 }
 
 /* ============================================================
@@ -62,8 +116,8 @@
   body {
     @apply bg-bg text-content font-sans antialiased;
     background-image:
-      radial-gradient(1200px 600px at 15% -10%, rgba(76, 141, 255, 0.06), transparent 60%),
-      radial-gradient(900px 500px at 100% 0%, rgba(34, 211, 238, 0.04), transparent 55%);
+      radial-gradient(1200px 600px at 15% -10%, var(--glow-a), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, var(--glow-b), transparent 55%);
     background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -146,4 +200,82 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ============================================================
+   Modular dashboard grid (react-grid-layout)
+   Base CSS is imported in WidgetGrid.tsx; these are theme overrides.
+   ============================================================ */
+.react-grid-item.cssTransforms {
+  transition-property: transform, width, height;
+}
+
+/* Drop-target preview while dragging/resizing */
+.react-grid-item.react-grid-placeholder {
+  background: var(--color-primary-soft);
+  border: 1.5px dashed var(--color-primary);
+  border-radius: 1.125rem;
+  opacity: 1;
+  transition-duration: 120ms;
+}
+
+.react-grid-item.react-draggable-dragging {
+  z-index: 40;
+  cursor: grabbing;
+}
+
+/* Custom resize handle – a subtle corner grip in brand color, edit-mode only */
+.react-grid-item > .react-resizable-handle {
+  background: none;
+}
+.react-grid-item > .react-resizable-handle::after {
+  content: '';
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid var(--color-primary);
+  border-bottom: 2px solid var(--color-primary);
+  border-bottom-right-radius: 2px;
+  opacity: 0.85;
+}
+
+/* Fill the whole grid cell */
+.wos-item {
+  height: 100%;
+  width: 100%;
+}
+.rgl-editing .wos-item {
+  cursor: grab;
+}
+
+/* iPhone-style gentle wiggle while arranging */
+@keyframes wos-wiggle {
+  0% {
+    transform: rotate(-0.5deg);
+  }
+  50% {
+    transform: rotate(0.5deg);
+  }
+  100% {
+    transform: rotate(-0.5deg);
+  }
+}
+.rgl-editing .react-grid-item:not(.react-draggable-dragging) .wos-item {
+  animation: wos-wiggle 0.62s ease-in-out infinite;
+  transform-origin: center;
+  will-change: transform;
+}
+.rgl-editing .react-grid-item:nth-child(2n):not(.react-draggable-dragging) .wos-item {
+  animation-duration: 0.7s;
+  animation-delay: -0.18s;
+}
+.rgl-editing .react-grid-item:nth-child(3n):not(.react-draggable-dragging) .wos-item {
+  animation-duration: 0.56s;
+  animation-delay: -0.3s;
+}
+.rgl-editing .react-grid-item.react-draggable-dragging .wos-item {
+  animation: none;
+  cursor: grabbing;
 }

@@ -44,8 +44,8 @@ export default {
         mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
       },
       boxShadow: {
-        card: '0 1px 0 0 rgba(255,255,255,0.02) inset, 0 8px 24px -12px rgba(0,0,0,0.6)',
-        'card-hover': '0 1px 0 0 rgba(255,255,255,0.04) inset, 0 16px 40px -16px rgba(0,0,0,0.7)',
+        card: 'var(--shadow-card)',
+        'card-hover': 'var(--shadow-card-hover)',
         glow: '0 0 0 1px rgba(76,141,255,0.35), 0 0 24px -4px rgba(76,141,255,0.35)',
         'glow-soft': '0 0 32px -8px rgba(76,141,255,0.35)',
       },

@@ -10,12 +10,14 @@ import { Button } from '@/components/ui/Button';
 import { Icon } from '@/components/ui/Icon';
 import { useAuthStore } from '@/store/useAuthStore';
 import { isSyncConfigured } from '@/lib/sync/supabaseClient';
+import { useThemeStore, type Theme } from '@/store/useThemeStore';
+import { cn } from '@/lib/utils/cn';
 
 export function SettingsPage() {
   const { tasks, replaceAll, clearAll } = useTaskStore(
     useShallow((s) => ({ tasks: s.tasks, replaceAll: s.replaceAll, clearAll: s.clearAll })),
   );
-  const resetWidgets = useWidgetStore((s) => s.resetWidgets);
+  const resetDashboard = useWidgetStore((s) => s.resetDashboard);
   const { user, signOut } = useAuthStore(useShallow((s) => ({ user: s.user, signOut: s.signOut })));
   const fileRef = useRef<HTMLInputElement>(null);
   const [note, setNote] = useState<string | null>(null);
@@ -115,8 +117,8 @@ export function SettingsPage() {
                   e.target.value = '';
                 }}
               />
-              <Button size="sm" variant="secondary" leftIcon={<Icon name="reset" size={15} />} onClick={resetWidgets}>
-                Widgets zurücksetzen
+              <Button size="sm" variant="secondary" leftIcon={<Icon name="reset" size={15} />} onClick={resetDashboard}>
+                Dashboard zurücksetzen
               </Button>
               <Button
                 size="sm"
@@ -140,14 +142,52 @@ export function SettingsPage() {
           <CardHeader>
             <CardTitle>Darstellung</CardTitle>
           </CardHeader>
-          <CardBody className="text-[13px] text-content-muted">
-            Die App nutzt konsequent Dark Mode und respektiert deine System-Einstellung für{' '}
-            <span className="text-content">reduzierte Bewegung</span> – Animationen werden dann automatisch
-            deaktiviert. Theme-Optionen folgen in einer späteren Version.
+          <CardBody className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="text-[13px]">
+                <p className="text-content">Design</p>
+                <p className="text-content-faint">Dark oder Light – jederzeit auch oben rechts umschaltbar.</p>
+              </div>
+              <ThemeSegmented />
+            </div>
+            <p className="text-[13px] text-content-muted">
+              Die App respektiert deine System-Einstellung für{' '}
+              <span className="text-content">reduzierte Bewegung</span> – Animationen werden dann automatisch
+              deaktiviert.
+            </p>
           </CardBody>
         </Card>
       </div>
     </Page>
+  );
+}
+
+function ThemeSegmented() {
+  const theme = useThemeStore((s) => s.theme);
+  const setTheme = useThemeStore((s) => s.setTheme);
+  const options: { value: Theme; label: string; icon: 'moon' | 'sun' }[] = [
+    { value: 'dark', label: 'Dark', icon: 'moon' },
+    { value: 'light', label: 'Light', icon: 'sun' },
+  ];
+  return (
+    <div className="inline-flex rounded-xl border border-border-strong bg-surface-elevated p-0.5">
+      {options.map((o) => (
+        <button
+          key={o.value}
+          type="button"
+          onClick={() => setTheme(o.value)}
+          className={cn(
+            'inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors',
+            theme === o.value
+              ? 'bg-primary text-white shadow-card'
+              : 'text-content-muted hover:text-content',
+          )}
+        >
+          <Icon name={o.icon} size={15} />
+          {o.label}
+        </button>
+      ))}
+    </div>
   );
 }
 

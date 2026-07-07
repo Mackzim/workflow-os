@@ -5,6 +5,7 @@ import { formatToday } from '@/lib/utils/format';
 import { cn } from '@/lib/utils/cn';
 import { Icon } from '@/components/ui/Icon';
 import { IconButton } from '@/components/ui/IconButton';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { BrandMark } from './Brand';
 
 export function TopBar() {
@@ -38,6 +39,7 @@ export function TopBar() {
 
       <div className="ml-auto flex items-center gap-3">
         <span className="hidden text-[12px] text-content-muted md:inline">{formatToday()}</span>
+        <ThemeToggle />
         <div
           className="flex h-8 w-8 items-center justify-center rounded-full border border-border-strong bg-surface-elevated text-[12px] font-semibold text-content-muted"
           title="Profil (Platzhalter)"

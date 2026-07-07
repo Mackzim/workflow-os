@@ -1,5 +1,4 @@
 import { motion, useReducedMotion } from 'framer-motion';
-import type { WidgetSize } from '@/lib/widgets/widgetTypes';
 import { useTasks } from '@/hooks/useTasks';
 import { EASE } from '@/lib/motion/motionPresets';
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber';
@@ -16,7 +15,7 @@ function Stat({ label, value, color }: { label: string; value: number; color: st
   );
 }
 
-export function ProgressWidget({ size }: { size: WidgetSize }) {
+export function ProgressWidget() {
   const { metrics } = useTasks();
   const reduced = useReducedMotion();
 
@@ -25,7 +24,7 @@ export function ProgressWidget({ size }: { size: WidgetSize }) {
   const offset = c - (metrics.todayProgress / 100) * c;
 
   return (
-    <WidgetShell title="Progress Today" icon="check" size={size}>
+    <WidgetShell title="Progress Today" icon="check">
       <div className="flex items-center gap-4">
         <div className="relative h-24 w-24 shrink-0">
           <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">

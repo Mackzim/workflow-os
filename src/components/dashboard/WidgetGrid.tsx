@@ -1,9 +1,20 @@
-import { Fragment } from 'react';
-import { motion } from 'framer-motion';
-import type { WidgetConfig } from '@/lib/widgets/widgetTypes';
+import { useRef } from 'react';
+import { Responsive, WidthProvider, type Layout, type Layouts } from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
+import type { Breakpoint, WidgetConfig, WidgetDefinition, WidgetKind } from '@/lib/widgets/widgetTypes';
 import { useWidgetConfig } from '@/hooks/useWidgetConfig';
-import { staggerContainer } from '@/lib/motion/motionPresets';
+import {
+  GRID_BREAKPOINTS,
+  GRID_COLS,
+  GRID_MARGIN,
+  GRID_ROW_HEIGHT,
+  WIDGET_CONSTRAINTS,
+} from '@/lib/widgets/widgetDefaults';
+import { cn } from '@/lib/utils/cn';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { IconButton } from '@/components/ui/IconButton';
+import { Icon } from '@/components/ui/Icon';
 import { TodayTasksWidget } from './widgets/TodayTasksWidget';
 import { OpenTasksWidget } from './widgets/OpenTasksWidget';
 import { HighPriorityWidget } from './widgets/HighPriorityWidget';
@@ -12,48 +23,111 @@ import { QuickAddWidget } from './widgets/QuickAddWidget';
 import { CommandWidget } from './widgets/CommandWidget';
 import { PlaceholderWidget } from './widgets/PlaceholderWidget';
 
+const ResponsiveGridLayout = WidthProvider(Responsive);
+const BREAKPOINTS: Breakpoint[] = ['lg', 'sm', 'xs'];
+
+function renderWidget(kind: WidgetKind, def: WidgetDefinition) {
+  switch (kind) {
+    case 'today':
+      return <TodayTasksWidget />;
+    case 'openTasks':
+      return <OpenTasksWidget />;
+    case 'highPriority':
+      return <HighPriorityWidget />;
+    case 'progress':
+      return <ProgressWidget />;
+    case 'quickAdd':
+      return <QuickAddWidget />;
+    case 'command':
+      return <CommandWidget />;
+    default:
+      return <PlaceholderWidget def={def} />;
+  }
+}
+
 export function WidgetGrid() {
-  const { orderedEnabled, definitions } = useWidgetConfig();
+  const { orderedEnabled, definitions, layouts, editing, setBreakpointLayout, removeWidget } = useWidgetConfig();
+  const currentBp = useRef<Breakpoint>('lg');
 
   if (orderedEnabled.length === 0) {
     return (
       <EmptyState
         icon="dashboard"
         title="Keine Widgets aktiv"
-        description="Aktiviere Widgets über „Widgets anpassen“ oben rechts."
+        description="Aktiviere Widgets oben rechts über den Widgets-Schalter."
       />
     );
   }
 
-  const render = (w: WidgetConfig) => {
-    switch (w.kind) {
-      case 'today':
-        return <TodayTasksWidget size={w.size} />;
-      case 'openTasks':
-        return <OpenTasksWidget size={w.size} />;
-      case 'highPriority':
-        return <HighPriorityWidget size={w.size} />;
-      case 'progress':
-        return <ProgressWidget size={w.size} />;
-      case 'quickAdd':
-        return <QuickAddWidget size={w.size} />;
-      case 'command':
-        return <CommandWidget size={w.size} />;
-      default:
-        return <PlaceholderWidget def={definitions[w.kind]} size={w.size} />;
-    }
+  const enabledKinds = new Set(orderedEnabled.map((w) => w.kind));
+
+  // Build react-grid-layout's per-breakpoint layouts: only enabled widgets,
+  // with sizing rails attached from the widget constraints.
+  const rglLayouts: Layouts = {};
+  for (const bp of BREAKPOINTS) {
+    rglLayouts[bp] = layouts[bp]
+      .filter((it) => enabledKinds.has(it.i))
+      .map((it) => {
+        const c = WIDGET_CONSTRAINTS[it.i];
+        return { ...it, minW: c.minW, minH: c.minH, maxW: c.maxW, maxH: c.maxH };
+      });
+  }
+
+  const handleLayoutChange = (current: Layout[]) => {
+    // Layout only changes through drag/resize, which is edit-mode only. Skipping
+    // otherwise avoids the mount echo overwriting a breakpoint we aren't on.
+    if (!editing) return;
+    setBreakpointLayout(currentBp.current, current);
   };
 
   return (
-    <motion.div
-      variants={staggerContainer}
-      initial="initial"
-      animate="animate"
-      className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+    <ResponsiveGridLayout
+      className={cn('-mx-1', editing && 'rgl-editing')}
+      layouts={rglLayouts}
+      breakpoints={GRID_BREAKPOINTS}
+      cols={GRID_COLS}
+      rowHeight={GRID_ROW_HEIGHT}
+      margin={GRID_MARGIN}
+      containerPadding={[4, 4]}
+      isDraggable={editing}
+      isResizable={editing}
+      draggableCancel=".no-drag"
+      resizeHandles={['se']}
+      compactType="vertical"
+      useCSSTransforms
+      measureBeforeMount={false}
+      onBreakpointChange={(bp) => {
+        if ((BREAKPOINTS as string[]).includes(bp)) currentBp.current = bp as Breakpoint;
+      }}
+      onLayoutChange={handleLayoutChange}
     >
-      {orderedEnabled.map((w) => (
-        <Fragment key={w.kind}>{render(w)}</Fragment>
+      {orderedEnabled.map((w: WidgetConfig) => (
+        <div key={w.kind}>
+          <div className="wos-item relative">
+            {editing && (
+              <>
+                <span
+                  className="pointer-events-none absolute left-2 top-2 z-20 text-content-faint/70"
+                  aria-hidden="true"
+                >
+                  <Icon name="grip" size={15} />
+                </span>
+                <div className="no-drag absolute right-2 top-2 z-20">
+                  <IconButton
+                    icon="close"
+                    label={`${definitions[w.kind].title} entfernen`}
+                    size={14}
+                    tone="danger"
+                    className="border border-border-strong bg-surface-elevated/90 backdrop-blur"
+                    onClick={() => removeWidget(w.kind)}
+                  />
+                </div>
+              </>
+            )}
+            {renderWidget(w.kind, definitions[w.kind])}
+          </div>
+        </div>
       ))}
-    </motion.div>
+    </ResponsiveGridLayout>
   );
 }

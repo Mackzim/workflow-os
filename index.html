@@ -8,12 +8,30 @@
     <meta name="theme-color" content="#0a0b0e" />
     <meta name="description" content="Personal Workflow OS – tasks, dashboard and a Claude command center." />
     <title>Workflow OS</title>
-    <!-- Paint the dark base immediately so there is no white flash before CSS/JS load (esp. in the Tauri window). -->
+    <!-- Resolve + apply the saved theme BEFORE first paint so there is no flash of the wrong theme. -->
+    <script>
+      (function () {
+        var theme = 'dark';
+        try {
+          var raw = localStorage.getItem('wos:theme');
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            var t = parsed && parsed.state && parsed.state.theme;
+            if (t === 'light' || t === 'dark') theme = t;
+          }
+        } catch (e) {}
+        var bg = theme === 'light' ? '#eef1f7' : '#0a0b0e';
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.style.backgroundColor = bg;
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', bg);
+      })();
+    </script>
     <style>
       html,
       body,
       #root {
-        background-color: #0a0b0e;
+        background-color: var(--color-bg, #0a0b0e);
       }
     </style>
   </head>

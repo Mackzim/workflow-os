@@ -1,11 +1,10 @@
 import { useMemo } from 'react';
-import type { WidgetSize } from '@/lib/widgets/widgetTypes';
 import { useTasks } from '@/hooks/useTasks';
 import { isDueToday, isOverdue } from '@/lib/tasks/taskUtils';
 import { WidgetShell } from './WidgetShell';
 import { TaskList } from '@/components/tasks/TaskList';
 
-export function TodayTasksWidget({ size }: { size: WidgetSize }) {
+export function TodayTasksWidget() {
   const { tasks } = useTasks();
   const today = useMemo(
     () =>
@@ -17,7 +16,7 @@ export function TodayTasksWidget({ size }: { size: WidgetSize }) {
   );
 
   return (
-    <WidgetShell title="Today Focus" icon="flame" size={size} subtitle={`${today.length} fällig`} to="/tasks">
+    <WidgetShell title="Today Focus" icon="flame" subtitle={`${today.length} fällig`} to="/tasks">
       <TaskList
         tasks={today}
         emptyTitle="Nichts für heute"
